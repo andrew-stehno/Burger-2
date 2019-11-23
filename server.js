@@ -1,8 +1,9 @@
 const express = require("express");
+const db = require("./models");
 
-var PORT = process.env.PORT || 3000;
+let PORT = process.env.PORT || 3000;
 
-var app = express();
+const app = express();
 
 app.use(express.static("public"));
 
@@ -11,13 +12,16 @@ app.use(express.json());
 
 var exphbs = require("express-handlebars");
 
+app.use(express.static("public"));
+
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
-var routes = require("./controllers/burgers_controller.js");
+require("./routes/api-routes.js")(app);
+require("./routes/html-routes.js")(app);
 
-app.use(routes);
-
-app.listen(PORT, function() {
-  console.log("App now listening at localhost: " + PORT);
+db.sequelize.sync({force: false}).then(function () {
+  app.listen(PORT, function () {
+    console.log("App now listening at localhost: " + PORT);
+  });
 });
